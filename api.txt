@@ -1,4 +1,0 @@
-{
-    "subscription_key":"05bf69f53ce541e6a3cd27e7eb7fb9e9",
-    "endpoint": "https://seaidemo4.cognitiveservices.azure.com/"
-}
