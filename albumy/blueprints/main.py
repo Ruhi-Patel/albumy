@@ -50,7 +50,6 @@ def index():
         photos = None
     tags = Tag.query.join(Tag.photos).group_by(Tag.id).order_by(func.count(Photo.id).desc()).limit(10)
     if photos is not None:
-        print(len(photos))
         for photo in photos:
             photo.text= alt_text(photo)
     return render_template('main/index.html', pagination=pagination, photos=photos, tags=tags, Collect=Collect)
@@ -421,9 +420,7 @@ def delete_tag(photo_id, tag_id):
 
 
 def alt_text(photo: Photo):
-    #print(os.path.dirname(os.path.abspath(__file__)),"/uploads")
     with open(os.path.abspath('api.txt')) as f:
-        #/Users/ruhipatel/albumy/albumy/blueprints/api.txt
         data = f.read()
     print("Data type before reconstruction : ", type(data))
         
@@ -445,4 +442,4 @@ def alt_text(photo: Photo):
         print(caption.text)
         
     return caption.text
-#alt_text()
+
