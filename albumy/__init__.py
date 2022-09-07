@@ -141,6 +141,7 @@ def register_commands(app):
 
         db.drop_all()
         db.create_all()
+        
 
         click.echo('Initializing the roles and permissions...')
         Role.init_role()

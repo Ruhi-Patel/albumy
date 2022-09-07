@@ -18,12 +18,24 @@ from albumy.forms.main import DescriptionForm, TagForm, CommentForm
 from albumy.models import User, Photo, Tag, Follow, Collect, Comment, Notification
 from albumy.notifications import push_comment_notification, push_collect_notification
 from albumy.utils import rename_image, resize_image, redirect_back, flash_errors
+from azure.cognitiveservices.vision.computervision import ComputerVisionClient
+from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
+from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
+from msrest.authentication import CognitiveServicesCredentials
+
+from array import array
+import os
+from PIL import Image
+import sys
+import time
+import json
 
 main_bp = Blueprint('main', __name__)
 
 
 @main_bp.route('/')
 def index():
+    print(" in index")
     if current_user.is_authenticated:
         page = request.args.get('page', 1, type=int)
         per_page = current_app.config['ALBUMY_PHOTO_PER_PAGE']
@@ -37,6 +49,10 @@ def index():
         pagination = None
         photos = None
     tags = Tag.query.join(Tag.photos).group_by(Tag.id).order_by(func.count(Photo.id).desc()).limit(10)
+    if photos is not None:
+        print(len(photos))
+        for photo in photos:
+            photo.text= alt_text(photo)
     return render_template('main/index.html', pagination=pagination, photos=photos, tags=tags, Collect=Collect)
 
 
@@ -131,6 +147,7 @@ def upload():
             filename_m=filename_m,
             author=current_user._get_current_object()
         )
+        photo.text= alt_text(photo)
         db.session.add(photo)
         db.session.commit()
     return render_template('main/upload.html')
@@ -149,6 +166,8 @@ def show_photo(photo_id):
     tag_form = TagForm()
 
     description_form.description.data = photo.description
+    photo.text= alt_text(photo)
+
     return render_template('main/photo.html', photo=photo, comment_form=comment_form,
                            description_form=description_form, tag_form=tag_form,
                            pagination=pagination, comments=comments)
@@ -399,3 +418,31 @@ def delete_tag(photo_id, tag_id):
 
     flash('Tag deleted.', 'info')
     return redirect(url_for('.show_photo', photo_id=photo_id))
+
+
+def alt_text(photo: Photo):
+    #print(os.path.dirname(os.path.abspath(__file__)),"/uploads")
+    with open(os.path.abspath('api.txt')) as f:
+        #/Users/ruhipatel/albumy/albumy/blueprints/api.txt
+        data = f.read()
+    print("Data type before reconstruction : ", type(data))
+        
+    # reconstructing the data as a dictionary
+    js = json.loads(data)
+    keys= list(js.keys())
+    
+    image_folder= os.path.join(os.path.dirname(os.path.abspath(photo.filename)),"uploads")
+    local_image_path = os.path.join (image_folder, photo.filename)
+    local_image = open(local_image_path, "rb")
+    subscription_key = js[keys[0]]
+    endpoint = js[keys[1]]
+    
+    computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
+
+    analysis = computervision_client.describe_image_in_stream(local_image)
+    
+    for caption in analysis.captions:
+        print(caption.text)
+        
+    return caption.text
+#alt_text()
