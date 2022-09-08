@@ -83,7 +83,7 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
-#API file
+#API key file
 api.txt
 
 # Environments
