@@ -41,6 +41,15 @@ Test account:
 API keys:
 ```
 Enter your subscription key (API key) and the endpoints in the api.txt file. You can get one by creating a api on microsoft azure service.
+The text file should be a dictionary.
+Follow this layout:
+```
+{
+    "subscription_key":"<your key>",
+    "endpoint": "<your endpoint>"
+}
+```
+
 ```
 
 ## License
