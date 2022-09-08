@@ -1,4 +1,0 @@
-{
-    "subscription_key":"<your key>",
-    "endpoint": "<your endpoint>"
-}
