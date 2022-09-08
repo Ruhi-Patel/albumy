@@ -38,6 +38,11 @@ Test account:
 * email: `admin@helloflask.com`
 * password: `helloflask`
 
+API keys:
+```
+Enter your subscription key (API key) and the endpoints in the api.txt file. You can get one by creating a api on microsoft azure service.
+```
+
 ## License
 
 This project is licensed under the MIT License (see the
